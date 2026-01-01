@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { TodoDto } from './dto/todo.dto';
+import { CreateTodoDto } from './dto/todo.dto';
 
 @Controller('todos')
 export class TodosController {
@@ -28,4 +29,11 @@ export class TodosController {
 
     return todo;
   }
+
+  @Post()
+  create(@Body() todo: CreateTodoDto): TodoDto {
+return this.todosService.create(todo);
+  }
+
+
 }

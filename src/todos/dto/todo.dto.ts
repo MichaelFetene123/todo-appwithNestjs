@@ -1,6 +1,9 @@
-export class TodoDto {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
+export class CreateTodoDto {
+  readonly title: string;
+  readonly description: string;
+}
+
+export class TodoDto extends CreateTodoDto {
+ readonly id: number;
+ readonly completed: boolean;
 }
