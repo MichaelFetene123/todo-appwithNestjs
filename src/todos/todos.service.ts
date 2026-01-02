@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TodoDto } from './dto/todo.dto';
+import { TodoDto, UpdateTodoDto } from './dto/todo.dto';
 import { CreateTodoDto } from './dto/todo.dto';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class TodosService {
       completed: false,
     },
   ];
+
   findAll(): TodoDto[] {
     return this.todos;
   }
@@ -35,5 +36,23 @@ export class TodosService {
 
     this.todos.push(newTodo);
     return newTodo;
+  }
+
+  update(id: number, todo: UpdateTodoDto): TodoDto | null {
+    const todoIndex = this.todos.findIndex((t) => t.id === id);
+    if (todoIndex < 0) {
+      return null;
+    }
+
+    this.todos[todoIndex] = {
+      ...this.todos[todoIndex],
+      ...todo,
+    };
+    return this.todos[todoIndex];
+  }
+  
+  remove(id: number): void {
+    const newTodos = this.todos.filter(todo => todo.id !== id)
+    this.todos = newTodos;
   }
 }
