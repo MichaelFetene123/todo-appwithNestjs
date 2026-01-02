@@ -37,7 +37,9 @@ return this.todosService.create(todo);
   }
 
 @Put(':id')
-  update(@Param('id') id: string, @Body() todo: UpdateTodoDto) :TodoDto | null {
+  update(@Param('id') id: string,
+
+   @Body() todo: UpdateTodoDto) :TodoDto | null {
     const updatedTodo = this.todosService.update(+id, todo);
     if(!updatedTodo){
       throw new NotFoundException(`Todo with id "${id}" not found`);
@@ -46,8 +48,8 @@ return this.todosService.create(todo);
   }
 
   @Delete(':id')
-  remove(@Param('id' ) id: string): void {
-    const todo = this.todosService.remove(+id);
+  remove(@Param('id' ) id: string) {
+    this.todosService.remove(+id);
   }
 
 }
