@@ -19,7 +19,10 @@ export class TodosService {
     },
   ];
 
-  findAll(): TodoDto[] {
+  findAll(showIncomplete?: boolean): TodoDto[] {
+    if (showIncomplete) {
+      return this.todos.filter(todo => !todo.completed);
+    }
     return this.todos;
   }
 

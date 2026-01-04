@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { TodoDto, UpdateTodoDto, CreateTodoDto } from './dto/todo.dto';
@@ -16,8 +17,8 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  findAll(): TodoDto[] {
-    return this.todosService.findAll();
+  findAll(@Query('showIncomplete') showIncomplete: boolean): TodoDto[] {
+    return this.todosService.findAll(showIncomplete);
   }
 
   @Get(':id')
@@ -49,7 +50,7 @@ return this.todosService.create(todo);
 
   @Delete(':id')
   remove(@Param('id' ) id: string) {
-    this.todosService.remove(+id);
+    return this.todosService.remove(+id);
   }
 
 }
