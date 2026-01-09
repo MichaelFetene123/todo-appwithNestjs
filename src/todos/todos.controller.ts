@@ -37,11 +37,20 @@ export class TodosController {
 return this.todosService.create(todo);
   }
 
-@Put(':id')
+@Put(':id/')
   update(@Param('id') id: string,
 
    @Body() todo: UpdateTodoDto) :TodoDto | null {
     const updatedTodo = this.todosService.update(+id, todo);
+    if(!updatedTodo){
+      throw new NotFoundException(`Todo with id "${id}" not found`);
+    }
+    return updatedTodo;
+  }
+
+  @Put(':id/completed')
+   complete(@Param('id') id: string): TodoDto {
+    const updatedTodo = this.todosService.markTodoCompleted(+id);
     if(!updatedTodo){
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }

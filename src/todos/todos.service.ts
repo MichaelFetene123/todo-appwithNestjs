@@ -21,7 +21,7 @@ export class TodosService {
 
   findAll(showIncomplete?: boolean): TodoDto[] {
     if (showIncomplete) {
-      return this.todos.filter(todo => !todo.completed);
+      return this.todos.filter((todo) => !todo.completed);
     }
     return this.todos;
   }
@@ -53,9 +53,22 @@ export class TodosService {
     };
     return this.todos[todoIndex];
   }
-  
+
+  markTodoCompleted(id: number): TodoDto | null {
+    const todoIndex = this.todos.findIndex((t) => t.id === id);
+    if (todoIndex < 0) {
+      return null;
+    }
+
+    this.todos[todoIndex] = {
+      ...this.todos[todoIndex],
+      completed: true,
+    };
+    return this.todos[todoIndex];
+  }
+
   remove(id: number): void {
-    const newTodos = this.todos.filter(todo => todo.id !== id)
+    const newTodos = this.todos.filter((todo) => todo.id !== id);
     this.todos = newTodos;
   }
 }
