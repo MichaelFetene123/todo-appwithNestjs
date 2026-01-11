@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { TodoDto, UpdateTodoDto } from './dto/todo.dto';
-import { CreateTodoDto } from './dto/todo.dto';
+import { Injectable, ParseBoolPipe } from '@nestjs/common';
+import { TodoDto, UpdateTodoDto, CreateTodoDto } from './dto/todo.dto';
 
 @Injectable()
 export class TodosService {
@@ -19,13 +18,28 @@ export class TodosService {
     },
   ];
 
-  findAll(showIncomplete?: boolean): TodoDto[] {
+  findAll(showIncomplete?: boolean,): TodoDto[] {
+    // If using controller, apply ParseBoolPipe in the controller method, not here.
     if (showIncomplete) {
       return this.todos.filter((todo) => !todo.completed);
     }
     return this.todos;
   }
 
+  markTodoCompleted(id: number): TodoDto | null {
+    const todoIndex = this.todos.findIndex((t) => t.id === id);
+    if (todoIndex < 0) {
+      return null;
+    }
+
+    this.todos[todoIndex] = {
+      ...this.todos[todoIndex],
+      completed: true,
+    };
+    return this.todos[todoIndex];
+    }
+
+    
   findOne(id: number): TodoDto | null {
     return this.todos.find((todo) => todo.id === id) || null;
   }
@@ -50,19 +64,6 @@ export class TodosService {
     this.todos[todoIndex] = {
       ...this.todos[todoIndex],
       ...todo,
-    };
-    return this.todos[todoIndex];
-  }
-
-  markTodoCompleted(id: number): TodoDto | null {
-    const todoIndex = this.todos.findIndex((t) => t.id === id);
-    if (todoIndex < 0) {
-      return null;
-    }
-
-    this.todos[todoIndex] = {
-      ...this.todos[todoIndex],
-      completed: true,
     };
     return this.todos[todoIndex];
   }

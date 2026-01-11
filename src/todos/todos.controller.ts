@@ -8,6 +8,7 @@ import {
   Delete,
   NotFoundException,
   Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { TodoDto, UpdateTodoDto, CreateTodoDto } from './dto/todo.dto';
@@ -17,8 +18,19 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  findAll(@Query('showIncomplete') showIncomplete: boolean): TodoDto[] {
+  findAll(
+    @Query('showIncomplete') showIncomplete?: boolean,
+  ): TodoDto[] {
     return this.todosService.findAll(showIncomplete);
+  }
+
+  @Put(':id/complete')
+  complete(@Param('id') id: string): TodoDto {
+    const updatedTodo = this.todosService.markTodoCompleted(+id);
+    if (!updatedTodo) {
+      throw new NotFoundException(`Todo with id "${id}" not found`);
+    }
+    return updatedTodo;
   }
 
   @Get(':id')
@@ -34,32 +46,24 @@ export class TodosController {
 
   @Post()
   create(@Body() todo: CreateTodoDto): TodoDto {
-return this.todosService.create(todo);
+    return this.todosService.create(todo);
   }
 
-@Put(':id/')
-  update(@Param('id') id: string,
+  @Put(':id/')
+  update(
+    @Param('id') id: string,
 
-   @Body() todo: UpdateTodoDto) :TodoDto | null {
+    @Body() todo: UpdateTodoDto,
+  ): TodoDto | null {
     const updatedTodo = this.todosService.update(+id, todo);
-    if(!updatedTodo){
-      throw new NotFoundException(`Todo with id "${id}" not found`);
-    }
-    return updatedTodo;
-  }
-
-  @Put(':id/completed')
-   complete(@Param('id') id: string): TodoDto {
-    const updatedTodo = this.todosService.markTodoCompleted(+id);
-    if(!updatedTodo){
+    if (!updatedTodo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }
     return updatedTodo;
   }
 
   @Delete(':id')
-  remove(@Param('id' ) id: string) {
+  remove(@Param('id') id: string) {
     return this.todosService.remove(+id);
   }
-
 }
