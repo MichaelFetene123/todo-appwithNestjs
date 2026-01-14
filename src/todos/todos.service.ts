@@ -20,11 +20,11 @@ export class TodosService {
 
   findAll(showIncomplete?: boolean,): TodoDto[] {
     // If using controller, apply ParseBoolPipe in the controller method, not here.
-    if (showIncomplete) {
-      return this.todos.filter((todo) => !todo.completed);
-    }
-    return this.todos;
-  }
+  //   if (showIncomplete) {
+  //     return this.todos.filter((todo) => !todo.completed);
+  //   }
+  //   return this.todos;
+  // }
 
   markTodoCompleted(id: number): TodoDto | null {
     const todoIndex = this.todos.findIndex((t) => t.id === id);
