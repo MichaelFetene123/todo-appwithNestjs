@@ -4,9 +4,12 @@ import { AppService } from './app.service';
 import { TodosController } from './todos/todos.controller';
 import { TodosService } from './todos/todos.service';
 import { TodosModule } from './todos/todos.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [TodosModule],
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost/nest'),
+    TodosModule],
   controllers: [AppController, TodosController],
   providers: [AppService, TodosService],
 })

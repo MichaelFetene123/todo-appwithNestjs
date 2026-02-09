@@ -18,24 +18,14 @@ export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
   @Get()
-  findAll(
-    @Query('showIncomplete') showIncomplete?: boolean,
-  ): TodoDto[] {
-    return this.todosService.findAll(showIncomplete);
-  }
-
-  @Put(':id/complete')
-  complete(@Param('id') id: string): TodoDto {
-    const updatedTodo = this.todosService.markTodoCompleted(+id);
-    if (!updatedTodo) {
-      throw new NotFoundException(`Todo with id "${id}" not found`);
-    }
-    return updatedTodo;
+  async findAll(@Query('showIncomplete') showIncomplete?: boolean) {
+    const todos = await this.todosService.findAll(showIncomplete);
+    return todos;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): TodoDto {
-    const todo = this.todosService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const todo = await this.todosService.findOne(id);
 
     if (!todo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
@@ -44,26 +34,38 @@ export class TodosController {
     return todo;
   }
 
-  @Post()
-  create(@Body() todo: CreateTodoDto): TodoDto {
-    return this.todosService.create(todo);
-  }
+  
+    @Post()
+   async create(@Body() todo: CreateTodoDto) {
+      const newTodo = await  this.todosService.createTodo(todo);
+      return newTodo;
+    }
 
-  @Put(':id/')
-  update(
-    @Param('id') id: string,
-
-    @Body() todo: UpdateTodoDto,
-  ): TodoDto | null {
-    const updatedTodo = this.todosService.update(+id, todo);
-    if (!updatedTodo) {
+    @Put(':id')
+   async update(
+      @Param('id') id: string,
+  
+      @Body() todo: UpdateTodoDto,
+    ) {
+      const updatedTodo = await this.todosService.updateTodo(id, todo);
+      if (!updatedTodo) {
+        throw new NotFoundException(`Todo with id "${id}" not found`);
+      }
+      return updatedTodo;
+    }
+    
+  @Put(':id/complete')
+  async  complete(@Param('id') id: string) {
+    const completedTodo = await this.todosService.markTodoComplete(id);
+    if (!completedTodo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }
-    return updatedTodo;
+    return completedTodo;
   }
 
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.todosService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.todosService.deleteTodo(id);
   }
 }

@@ -4,7 +4,7 @@ export class CreateTodoDto {
 }
 
 export class TodoDto extends CreateTodoDto {
- readonly id: number;
+ readonly id: string;
  readonly completed: boolean;
 }
 
