@@ -1,4 +1,5 @@
 import { Expose, Exclude } from 'class-transformer';
+import {IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 
 @Exclude()
@@ -19,13 +20,17 @@ export class TodoDto  {
 
 @Exclude()
 export class CreateTodoDto {
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
   @Expose()
-    title: string;
-    
-  @Expose()
-    description: string;  
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
+
 
 @Exclude()
 export class UpdateTodoDto {

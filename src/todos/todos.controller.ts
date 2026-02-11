@@ -8,10 +8,17 @@ import {
   Delete,
   NotFoundException,
   Query,
-  ParseBoolPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { TodoDto, UpdateTodoDto, CreateTodoDto } from './dto/todo.dto';
+import { plainToClass } from 'class-transformer';
+import { TodoDocument } from './schemas/todo.schemas';
+
+function transformTodoDto(todo: TodoDocument): TodoDto {
+  return plainToClass(TodoDto, todo.toJSON());
+}
+
 
 @Controller('todos')
 export class TodosController {
@@ -37,7 +44,7 @@ export class TodosController {
   }
 
   @Post()
-  async create(@Body() todo: CreateTodoDto): Promise<TodoDto> {
+  async create(@Body(new ValidationPipe()) todo: CreateTodoDto): Promise<TodoDto> {
     const newTodo = await this.todosService.createTodo(todo);
     return newTodo;
   }
