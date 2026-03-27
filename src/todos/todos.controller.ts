@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Query,
   ValidationPipe,
+  Request,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { TodoDto, UpdateTodoDto, CreateTodoDto } from './dto/todo.dto';
@@ -19,6 +20,11 @@ function transformTodoDto(todo: TodoDocument): TodoDto {
   return plainToClass(TodoDto, todo.toJSON());
 }
 
+function userIdFromRequest(req: any): string {
+  // The user should be set on the request object by the AuthGuard.
+  // This information was embedded within the JWT token
+  return req.user?.sub ?? '';
+}
 
 @Controller('todos')
 export class TodosController {
@@ -26,54 +32,66 @@ export class TodosController {
 
   @Get()
   async findAll(
+    @Request() req,
     @Query('showIncomplete') showIncomplete?: boolean,
   ): Promise<TodoDto[]> {
-    const todos = await this.todosService.findAll(showIncomplete);
-    return todos;
+    const userId = userIdFromRequest(req);
+    const todos = await this.todosService.findAll(userId, showIncomplete);
+    return todos.map(transformTodoDto);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<TodoDto> {
-    const todo = await this.todosService.findOne(id);
+  async findOne(@Request() req, @Param('id') id: string): Promise<TodoDto> {
+    const userId = userIdFromRequest(req);
+    const todo = await this.todosService.findOne(userId, id);
 
     if (!todo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }
 
-    return todo;
+    return transformTodoDto(todo);
   }
 
   @Post()
-  async create(@Body(new ValidationPipe()) todo: CreateTodoDto): Promise<TodoDto> {
-    const newTodo = await this.todosService.createTodo(todo);
-    return newTodo;
+  async create(
+    @Request() req,
+    @Body(new ValidationPipe()) todo: CreateTodoDto,
+  ): Promise<TodoDto> {
+    const userId = userIdFromRequest(req);
+    const newTodo = await this.todosService.createTodo(userId, todo);
+    return transformTodoDto(newTodo);
   }
 
   @Put(':id')
   async update(
+    @Request() req,
     @Param('id') id: string,
 
     @Body() todo: UpdateTodoDto,
   ): Promise<TodoDto> {
-    const updatedTodo = await this.todosService.updateTodo(id, todo);
+    const userId = userIdFromRequest(req);
+    const updatedTodo = await this.todosService.updateTodo(userId, id, todo);
     if (!updatedTodo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }
-    return updatedTodo;
+    
+    return transformTodoDto(updatedTodo);
   }
 
   @Put(':id/complete')
-  async complete(@Param('id') id: string): Promise<TodoDto> {
-    const completedTodo = await this.todosService.markTodoComplete(id);
+  async complete(@Request() req, @Param('id') id: string): Promise<TodoDto> {
+    const userId = userIdFromRequest(req);
+    const completedTodo = await this.todosService.markTodoComplete(userId, id);
     if (!completedTodo) {
       throw new NotFoundException(`Todo with id "${id}" not found`);
     }
-    return completedTodo;
+    return transformTodoDto(completedTodo);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    await this.todosService.deleteTodo(id);
+  async remove(@Request() req, @Param('id') id: string): Promise<void> {
+    const userId = userIdFromRequest(req);
+    await this.todosService.deleteTodo(userId, id);
     return;
   }
 }

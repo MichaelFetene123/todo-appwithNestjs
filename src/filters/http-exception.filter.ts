@@ -23,17 +23,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       response.status(status).json(errorResponse);
-    } 
+    }
     const exceptionResponse = exception.getResponse();
-const message =
-  typeof exceptionResponse === 'string'
-    ? exceptionResponse
-    : (exceptionResponse as any).message;
+    const message =
+      typeof exceptionResponse === 'string'
+        ? exceptionResponse
+        : (exceptionResponse as any).message;
 
     response.status(status).json({
       ...errorResponse,
       message,
     });
-
   }
 }
